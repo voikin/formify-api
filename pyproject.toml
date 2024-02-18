@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "formify-api"
+version = "0.1.0"
+description = ""
+authors = ["voikin <woysen@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+sqlalchemy = "^2.0.27"
+fastapi = "^0.109.2"
+pydantic = "^2.6.1"
+uvicorn = "^0.27.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
