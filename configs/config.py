@@ -19,17 +19,18 @@ class AuthJWT(BaseModel):
     refresh_token_expire_minutes: int = 60
 
 
+def singleton(cls):
+    instances = {}
+
+    def get_instance(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+
+    return get_instance
+
+
+@singleton
 class Settings(BaseSettings):
     jwt: AuthJWT = AuthJWT()
     db: DBSettings = DBSettings()
-
-
-class SingletonSettings:
-    _instance = None
-    _lock = Lock()
-
-    def __new__(cls):
-        with cls._lock:
-            if cls._instance is None:
-                cls._instance = Settings()
-        return cls._instance

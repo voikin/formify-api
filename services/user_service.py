@@ -3,13 +3,13 @@ import bcrypt
 import jwt
 from fastapi import HTTPException
 from starlette import status
-from configs.config import SingletonSettings
+from configs.config import Settings
 from models import db, User
 from repositories.abc_repositories import AbstractUserRepository
 from repositories.sqlalchemy.user_repository import UserRepository
 from schemas.auth_schemas import TokenInfo
 
-settings = SingletonSettings()
+settings = Settings()
 
 
 class UserService:

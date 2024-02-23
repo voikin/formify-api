@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from configs.config import SingletonSettings
+from configs.config import Settings
 
-settings = SingletonSettings()
+settings = Settings()
 
 
 class DatabaseHelper:
