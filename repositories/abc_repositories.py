@@ -6,7 +6,9 @@ from models import User
 
 class AbstractUserRepository(ABC):
     @abstractmethod
-    async def create_user(self, email: str, name: str, hashed_password: bytes) -> Optional[User]:
+    async def create_user(
+        self, email: str, name: str, hashed_password: bytes
+    ) -> Optional[User]:
         raise NotImplementedError()
 
     @abstractmethod

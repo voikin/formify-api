@@ -1,8 +1,4 @@
-__all__ = (
-    'Base',
-    'User',
-    'db'
-)
+__all__ = ("Base", "User", "db")
 
 from models.base import Base
 from models.user import User

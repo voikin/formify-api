@@ -17,9 +17,10 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router)
 
 
-@app.get('/ping', tags=['test'])
+@app.get("/ping", tags=["test"])
 async def ping():
-    return {'message': 'pong'}
+    return {"message": "pong"}
 
-if __name__ == '__main__':
-    uvicorn.run('main:app', reload=True)
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", reload=True)

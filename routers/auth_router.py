@@ -11,87 +11,51 @@ router = APIRouter(
 )
 
 
-@router.post(
-    "/login",
-    response_model=TokenInfo
-)
+@router.post("/login", response_model=TokenInfo)
 async def login(
-        response: Response,
-        user_cred: RequestLoginSchema,
-        users_service: Annotated[UserService, Depends(user_service)]
+    response: Response,
+    user_cred: RequestLoginSchema,
+    users_service: Annotated[UserService, Depends(user_service)],
 ):
     tokens = await users_service.login_user(
-        email=user_cred.email,
-        password=user_cred.password
+        email=user_cred.email, password=user_cred.password
     )
 
-    response.set_cookie(
-        key="refresh_token",
-        value=tokens.refresh_token,
-        httponly=True
-    )
+    response.set_cookie(key="refresh_token", value=tokens.refresh_token, httponly=True)
 
-    response.set_cookie(
-        key="access_token",
-        value=tokens.access_token,
-        httponly=True
-    )
+    response.set_cookie(key="access_token", value=tokens.access_token, httponly=True)
 
     return tokens
 
 
-@router.post(
-    "/signup",
-    response_model=TokenInfo
-)
+@router.post("/signup", response_model=TokenInfo)
 async def signup(
-        response: Response,
-        user_cred: RequestSignupSchema,
-        users_service: Annotated[UserService, Depends(user_service)]
+    response: Response,
+    user_cred: RequestSignupSchema,
+    users_service: Annotated[UserService, Depends(user_service)],
 ):
     tokens = await users_service.create_user(
-        email=user_cred.email,
-        name=user_cred.name,
-        password=user_cred.password
+        email=user_cred.email, name=user_cred.name, password=user_cred.password
     )
 
-    response.set_cookie(
-        key="refresh_token",
-        value=tokens.refresh_token,
-        httponly=True
-    )
+    response.set_cookie(key="refresh_token", value=tokens.refresh_token, httponly=True)
 
-    response.set_cookie(
-        key="access_token",
-        value=tokens.access_token,
-        httponly=True
-    )
+    response.set_cookie(key="access_token", value=tokens.access_token, httponly=True)
 
     return tokens
 
 
-@router.post(
-    '/refresh',
-    response_model=TokenInfo
-)
+@router.post("/refresh", response_model=TokenInfo)
 async def refresh_access_token(
-        request: Request,
-        response: Response,
-        users_service: Annotated[UserService, Depends(user_service)]
+    request: Request,
+    response: Response,
+    users_service: Annotated[UserService, Depends(user_service)],
 ):
     refresh_token = request.cookies.get("refresh_token")
     tokens = await users_service.refresh_access_token(refresh_token)
 
-    response.set_cookie(
-        key="refresh_token",
-        value=tokens.refresh_token,
-        httponly=True
-    )
+    response.set_cookie(key="refresh_token", value=tokens.refresh_token, httponly=True)
 
-    response.set_cookie(
-        key="access_token",
-        value=tokens.access_token,
-        httponly=True
-    )
+    response.set_cookie(key="access_token", value=tokens.access_token, httponly=True)
 
     return tokens

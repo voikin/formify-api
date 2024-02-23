@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).parent.parent
 
 
 class DBSettings(BaseModel):
-    url: str = 'postgresql+asyncpg://postgres:changeme@localhost:5432/'
+    url: str = "postgresql+asyncpg://postgres:changeme@localhost:5432/"
     echo: bool = False
 
 
