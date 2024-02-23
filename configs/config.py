@@ -1,7 +1,7 @@
 from pathlib import Path
-
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
+from threading import Lock
 
 BASE_DIR = Path(__file__).parent.parent
 
@@ -24,4 +24,12 @@ class Settings(BaseSettings):
     db: DBSettings = DBSettings()
 
 
-settings = Settings()
+class SingletonSettings:
+    _instance = None
+    _lock = Lock()
+
+    def __new__(cls):
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = Settings()
+        return cls._instance
