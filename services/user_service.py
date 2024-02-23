@@ -1,15 +1,15 @@
 from datetime import timedelta, datetime
+from typing_extensions import Optional
 import bcrypt
 import jwt
 from fastapi import HTTPException
+from jwt import algorithms
 from starlette import status
 from configs.config import Settings
 from models import db, User
 from repositories.abc_repositories import AbstractUserRepository
 from repositories.sqlalchemy.user_repository import UserRepository
 from schemas.auth_schemas import TokenInfo
-
-settings = Settings()
 
 
 class UserService:
@@ -79,11 +79,22 @@ class UserService:
     @staticmethod
     def encode_jwt(
         payload: dict,
-        private_key: str = settings.jwt.private_key_path.read_text(),
-        algorithm: str = settings.jwt.algorithm,
-        expire_minutes: int = settings.jwt.access_token_expire_minutes,
-        expire_timedelta: timedelta | None = None,
+        private_key: Optional[str] = None,
+        algorithm: Optional[str] = None,
+        expire_minutes: Optional[int] = None,
+        expire_timedelta: Optional[timedelta] = None,
     ):
+        settings = Settings()
+
+        if not private_key:
+            private_key = settings.jwt.private_key_path.read_text()
+
+        if not algorithm:
+            algorithm = settings.jwt.algorithm
+
+        if not expire_minutes:
+            expire_minutes = settings.jwt.access_token_expire_minutes
+
         to_encode = payload.copy()
         now = datetime.utcnow()
 
@@ -101,17 +112,28 @@ class UserService:
     @staticmethod
     def decode_jwt(
         token: str,
-        public_key: str = settings.jwt.public_key_path.read_text(),
-        algorithm: str = settings.jwt.algorithm,
+        public_key: Optional[str] = None,
+        algorithm: Optional[str] = None,
     ):
+        settings = Settings()
+
+        if not public_key:
+            public_key = settings.jwt.public_key_path.read_text()
+
+        if not algorithm:
+            algorithm = settings.jwt.algorithm
+
         decoded = jwt.decode(token, public_key, algorithms=[algorithm])
 
         return decoded
 
     async def create_refresh_token(self, payload: dict, user_id: int) -> str:
+        settings = Settings()
+
         refresh_token = self.encode_jwt(
             payload=payload, expire_minutes=settings.jwt.refresh_token_expire_minutes
         )
+
         await self.user_repo.update_refresh_token(user_id, refresh_token)
         return refresh_token
 
