@@ -1,3 +1,4 @@
+from misc.singleton import singleton
 from pathlib import Path
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
@@ -17,17 +18,6 @@ class AuthJWT(BaseModel):
     algorithm: str = "RS256"
     access_token_expire_minutes: int = 30
     refresh_token_expire_minutes: int = 60
-
-
-def singleton(cls):
-    instances = {}
-
-    def get_instance(*args, **kwargs):
-        if cls not in instances:
-            instances[cls] = cls(*args, **kwargs)
-        return instances[cls]
-
-    return get_instance
 
 
 @singleton
