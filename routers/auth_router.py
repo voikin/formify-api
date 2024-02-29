@@ -45,7 +45,7 @@ async def signup(
     return tokens
 
 
-@router.post("/refresh", response_model=AuthResponse)
+@router.get("/refresh", response_model=AuthResponse)
 async def refresh_access_token(
     request: Request,
     response: Response,
@@ -59,3 +59,11 @@ async def refresh_access_token(
     response.set_cookie(key="access_token", value=tokens.access_token, httponly=True)
 
     return tokens
+
+@router.get("/logout")
+async def logout(
+    response: Response
+):
+    response.delete_cookie(key="refresh_token")
+    response.delete_cookie(key="access_token")
+    
