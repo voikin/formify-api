@@ -3,20 +3,19 @@ from typing_extensions import Optional
 import bcrypt
 import jwt
 from fastapi import HTTPException
-from jwt import algorithms
 from starlette import status
 from configs.config import Settings
-from models import db, User
+from models import db
 from repositories.abc_repositories import AbstractUserRepository
 from repositories.sqlalchemy.user_repository import UserRepository
-from schemas.auth_schemas import TokenInfo
+from schemas.auth_schemas import AuthResponse, UserSchema
 
 
 class UserService:
     def __init__(self, user_repo: AbstractUserRepository):
         self.user_repo = user_repo
 
-    async def login_user(self, email: str, password: str) -> TokenInfo:
+    async def login_user(self, email: str, password: str) -> AuthResponse:
         unauth_exp = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
@@ -34,11 +33,17 @@ class UserService:
         access_token = self.encode_jwt(jwt_payload)
         refresh_token = await self.create_refresh_token(jwt_payload, user_from_db.id)
 
-        return TokenInfo(
-            access_token=access_token, refresh_token=refresh_token, token_type="Bearer"
+        return AuthResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            user=UserSchema(
+                id=user_from_db.id,
+                email=user_from_db.email,
+                username=user_from_db.name
+            )
         )
-
-    async def create_user(self, email: str, name: str, password: str) -> TokenInfo:
+        
+    async def create_user(self, email: str, name: str, password: str) -> AuthResponse:
         user_from_db = await self.user_repo.get_user_by_email(email)
 
         if user_from_db:
@@ -52,7 +57,7 @@ class UserService:
 
         return await self.login_user(email, password)
 
-    async def refresh_access_token(self, refresh_token: str) -> TokenInfo:
+    async def refresh_access_token(self, refresh_token: str) -> AuthResponse:
         user = await self.user_repo.get_user_by_refresh_token(refresh_token)
 
         if not user:
@@ -72,8 +77,14 @@ class UserService:
 
         access_token = self.encode_jwt(jwt_payload)
         refresh_token = await self.create_refresh_token(jwt_payload, user.id)
-        return TokenInfo(
-            access_token=access_token, refresh_token=refresh_token, token_type="Bearer"
+        return AuthResponse(
+            access_token=access_token, 
+            refresh_token=refresh_token, 
+            user=UserSchema(
+                id=user.id,
+                email=user.email,
+                username=user.name
+            )
         )
 
     @staticmethod

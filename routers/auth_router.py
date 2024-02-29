@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Response, Request
 
-from schemas.auth_schemas import RequestLoginSchema, RequestSignupSchema, TokenInfo
+from schemas.auth_schemas import RequestLoginSchema, RequestSignupSchema, AuthResponse
 from services.user_service import UserService, user_service
 
 router = APIRouter(
@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 
-@router.post("/login", response_model=TokenInfo)
+@router.post("/login", response_model=AuthResponse)
 async def login(
     response: Response,
     user_cred: RequestLoginSchema,
@@ -28,7 +28,7 @@ async def login(
     return tokens
 
 
-@router.post("/signup", response_model=TokenInfo)
+@router.post("/signup", response_model=AuthResponse)
 async def signup(
     response: Response,
     user_cred: RequestSignupSchema,
@@ -45,7 +45,7 @@ async def signup(
     return tokens
 
 
-@router.post("/refresh", response_model=TokenInfo)
+@router.post("/refresh", response_model=AuthResponse)
 async def refresh_access_token(
     request: Request,
     response: Response,

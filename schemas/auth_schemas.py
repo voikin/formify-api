@@ -12,7 +12,13 @@ class RequestSignupSchema(BaseModel):
     password: str = Field(min_length=4, max_length=20)
 
 
-class TokenInfo(BaseModel):
+class UserSchema(BaseModel):
+    id: int
+    email: str
+    username: str
+
+
+class AuthResponse(BaseModel):
     access_token: str
     refresh_token: str
-    token_type: str
+    user: UserSchema
