@@ -1,13 +1,15 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
+from typing import Optional
+
+from sqlalchemy import Integer, ForeignKey
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from models import Base
 
 
 class Test(Base):
-    title = Column(String, nullable=False)
-    description = Column(String)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    title: Mapped[str]
+    description: Mapped[Optional[str]]
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
 
     # Отношение к вопросам
     questions = relationship("Question", back_populates="test")
