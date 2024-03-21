@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
 
 class RequestLoginSchema(BaseModel):
@@ -13,9 +13,11 @@ class RequestSignupSchema(BaseModel):
 
 
 class UserSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     email: str
-    username: str
+    name: str
 
 
 class AuthResponse(BaseModel):

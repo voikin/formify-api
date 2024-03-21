@@ -2,13 +2,19 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Response, Request
 
-from schemas.auth_schemas import RequestLoginSchema, RequestSignupSchema, AuthResponse
-from services.user_service import UserService, user_service
+from models import User
+from schemas.auth_schemas import RequestLoginSchema, RequestSignupSchema, AuthResponse, UserSchema
+from services.user_service import UserService, user_service, get_user
 
 router = APIRouter(
     prefix="/auth",
     tags=["auth"],
 )
+
+
+@router.get('/me', response_model=UserSchema)
+async def me(user: Annotated[User, Depends(get_user)]):
+    return user
 
 
 @router.post("/login", response_model=AuthResponse)

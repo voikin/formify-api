@@ -1,8 +1,12 @@
 from datetime import timedelta, datetime
+from typing import Annotated
+
 from typing_extensions import Optional
 import bcrypt
 import jwt
-from fastapi import HTTPException
+from jwt.exceptions import PyJWTError
+from fastapi import HTTPException, Depends, Security
+from fastapi.security import APIKeyCookie
 from starlette import status
 from configs.config import Settings
 from models import db
@@ -36,11 +40,7 @@ class UserService:
         return AuthResponse(
             access_token=access_token,
             refresh_token=refresh_token,
-            user=UserSchema(
-                id=user_from_db.id,
-                email=user_from_db.email,
-                username=user_from_db.name
-            )
+            user=UserSchema.from_orm(user_from_db)
         )
         
     async def create_user(self, email: str, name: str, password: str) -> AuthResponse:
@@ -86,6 +86,27 @@ class UserService:
                 username=user.name
             )
         )
+
+    async def auth_user_by_token(self, token: str):
+        unauth_exp = HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect token",
+        )
+        try:
+            decoded = self.decode_jwt(token)
+        except PyJWTError:
+            raise unauth_exp
+        user_id = decoded.get('sub')
+
+        if not user_id:
+            raise unauth_exp
+
+        user = await self.user_repo.get_user_by_id(user_id)
+        if not user:
+            raise unauth_exp
+
+        return user
+
 
     @staticmethod
     def encode_jwt(
@@ -160,3 +181,10 @@ class UserService:
 
 def user_service():
     return UserService(UserRepository(db.session_factory))
+
+
+auth_scheme = APIKeyCookie(name='access_token')
+
+
+async def get_user(user_service: Annotated[UserService, Depends(user_service)], token: Annotated[str, Security(auth_scheme)]):
+    return await user_service.auth_user_by_token(token)
