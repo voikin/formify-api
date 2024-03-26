@@ -45,6 +45,5 @@ class UserRepository(AbstractUserRepository):
                 .first()
             )
             user.refresh_token = refresh_token
-            print(refresh_token)
             session.add(user)
             await session.commit()

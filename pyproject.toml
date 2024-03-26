@@ -19,6 +19,8 @@ asyncpg = "^0.29.0"
 greenlet = "^3.0.3"
 bcrypt = "^4.1.2"
 pylint = "^3.0.3"
+alembic = "^1.13.1"
+aiomysql = "^0.2.0"
 
 
 [build-system]
