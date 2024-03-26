@@ -9,7 +9,7 @@ from fastapi import HTTPException, Depends, Security
 from fastapi.security import APIKeyCookie
 from starlette import status
 from configs.config import Settings
-from models import db
+from models import db, User
 from repositories.abc_repositories import AbstractUserRepository
 from repositories.sqlalchemy.user_repository import UserRepository
 from schemas.auth_schemas import AuthResponse, UserSchema
@@ -83,7 +83,7 @@ class UserService:
             user=UserSchema(
                 id=user.id,
                 email=user.email,
-                username=user.name
+                name=user.name
             )
         )
 
@@ -188,3 +188,5 @@ auth_scheme = APIKeyCookie(name='access_token')
 
 async def get_user(user_service: Annotated[UserService, Depends(user_service)], token: Annotated[str, Security(auth_scheme)]):
     return await user_service.auth_user_by_token(token)
+
+current_user = Annotated[User, Depends(get_user)]

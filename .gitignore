@@ -4,3 +4,4 @@
 pyrightconfig.json
 venv
 .env
+.DS_Store

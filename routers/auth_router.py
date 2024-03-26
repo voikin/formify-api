@@ -2,9 +2,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Response, Request
 
-from models import User
 from schemas.auth_schemas import RequestLoginSchema, RequestSignupSchema, AuthResponse, UserSchema
-from services.user_service import UserService, user_service, get_user
+from services.user_service import UserService, user_service, current_user
 
 router = APIRouter(
     prefix="/auth",
@@ -13,7 +12,7 @@ router = APIRouter(
 
 
 @router.get('/me', response_model=UserSchema)
-async def me(user: Annotated[User, Depends(get_user)]):
+async def me(user: current_user):
     return user
 
 

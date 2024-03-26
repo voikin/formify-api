@@ -1,27 +1,32 @@
 from enum import Enum
+from typing import Optional
 
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Integer, ForeignKey, UniqueConstraint, String
+from sqlalchemy.dialects.mysql import ENUM
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from models import Base
 
 
 class QuestionTypeEnum(Enum):
-    single_choice = 'single_choice'
-    multiple_choice = 'multiple_choice'
-    free_text = 'free_text'
+    oneChoice = 'oneChoice'
+    multiChoice = 'multiChoice'
+    answer = 'answer'
 
 
-question_type_enum = ENUM('single_choice', 'multiple_choice', 'free_text', name='question_type', create_type=True)
-
+question_type_enum = ENUM('oneChoice', 'multiChoice', 'answer', name='question_type')
 
 class Question(Base):
-    text: Mapped[str]
+    text: Mapped[str] = mapped_column(String(255))
+    description: Mapped[Optional[str]] = mapped_column(String(255))
     type: Mapped[QuestionTypeEnum] = mapped_column(question_type_enum)
-    number_in_question: Mapped[int]
-    test_id: Mapped[int] = mapped_column(Integer, ForeignKey('tests.id'), nullable=False)
+    number_in_test: Mapped[int]
+    test_id: Mapped[int] = mapped_column(Integer, ForeignKey('forms.id'), nullable=False)
 
     # Отношения
-    test = relationship("Test", back_populates="questions")
-    answers = relationship("Answer", back_populates="question")
+    form = relationship("Form", back_populates="questions")
+    answers = relationship("Answer", back_populates="question", cascade="all, delete-orphan")
+
+    __table_args__ = (
+        UniqueConstraint('test_id', 'number_in_test', name='_test_number_uc'),
+    )
